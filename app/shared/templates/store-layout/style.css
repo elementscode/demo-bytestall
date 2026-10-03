@@ -1,0 +1,37 @@
+.store-header {
+  border-bottom: 1px solid var(--rule);
+}
+
+.store-header-inner {
+  justify-content: space-between;
+  padding-block: var(--space-4);
+}
+
+.store-brand {
+  gap: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-md);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-tight);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.store-brand svg {
+  color: var(--accent);
+}
+
+.store-nav a {
+  font-size: var(--text-sm);
+}
+
+.store-footer {
+  border-top: 1px solid var(--rule);
+}
+
+.store-footer-inner {
+  justify-content: space-between;
+  padding-block: var(--space-6);
+  font-size: var(--text-sm);
+  color: var(--ink-dim);
+}

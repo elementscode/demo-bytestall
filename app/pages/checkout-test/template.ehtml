@@ -1,0 +1,92 @@
+import "./style.css";
+import favicon from "#app/shared/assets/favicons/favicon.svg";
+import { redirect } from "@elements/app";
+import { StoreLayout } from "#app/shared/templates/store-layout";
+import { coverUrl, fileLabel, formatPrice, productKind } from "#app/shared/services/catalog";
+import { payTestOrder, TestOrder } from "./services";
+
+interface PayState {
+  busy: boolean;
+  error: string;
+}
+
+function onPay(orderId: string, state: PayState) {
+  state.busy = true;
+  state.error = "";
+
+  try {
+    redirect(payTestOrder(orderId));
+  } catch (err: any) {
+    state.error = err.message;
+    state.busy = false;
+  }
+}
+
+<html lang="en" class="page-checkout-test" (
+  order: TestOrder,
+  private state: PayState = { busy: false, error: "" },
+)>
+  <head>
+    <title>Checkout · bytestall</title>
+    <meta name="robots" content="noindex">
+    <link rel="icon" type="image/svg+xml" href={favicon} />
+  </head>
+  <body>
+    <StoreLayout isAdmin={false}>
+      <div class="page-shell is-form receipt-shell stack is-xl">
+        <div class="stack is-sm">
+          <div class="cluster is-sm">
+            <span class="pill is-warning">Test mode</span>
+          </div>
+          <h1>Checkout</h1>
+          <p class="lede">Your download link goes to <strong class="test-email">{order.email}</strong>.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-body stack is-lg">
+            <div class="receipt-item row">
+              <img class="receipt-cover"
+                   src={coverUrl({ id: order.productId, coverHash: order.coverHash })}
+                   alt={`Cover of ${order.productTitle}`}
+                   width="600"
+                   height="800">
+
+              <div class="test-line stack is-xs">
+                <h2>{order.productTitle}</h2>
+                <p class="receipt-note">{productKind(order.fileType)} · {fileLabel(order.fileType)}</p>
+              </div>
+
+              <p class="test-amount">{formatPrice(order.amountCents)}</p>
+            </div>
+
+            <div class="test-total row">
+              <span>Total due</span>
+              <span class="test-total-amount">{formatPrice(order.amountCents)}</span>
+            </div>
+
+            <p e:if={state.error} class="error" role="alert">{state.error}</p>
+
+            <div class="stack is-sm">
+              <button type="button"
+                      class={["is-primary", "is-lg", "is-block", state.busy && "is-loading"]}
+                      disabled={state.busy}
+                      onclick={() => onPay(order.id, state)}>
+                Pay {formatPrice(order.amountCents)}
+              </button>
+              <a class="test-cancel link-muted" href={`/products/${order.productSlug}`}>Cancel and go back</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout is-warning">
+          <div class="callout-title">No card is charged</div>
+          <div class="callout-body">
+            This is the store's built-in test checkout. Paying here records the sale and sends the
+            download email like a real payment. Add <code>STRIPE_SECRET_KEY</code> to
+            <code>config/env/development.env</code> and this button goes to Stripe Checkout instead.
+          </div>
+        </div>
+      </div>
+    </StoreLayout>
+  </body>
+</html>

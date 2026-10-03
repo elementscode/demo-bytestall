@@ -1,0 +1,139 @@
+import "./style.css";
+import favicon from "#app/shared/assets/favicons/favicon.svg";
+import { AdminLayout } from "#app/shared/templates/admin-layout";
+import { coverUrl, fileLabel, formatPrice, formatSize } from "#app/shared/services/catalog";
+import { NewProduct, ProductRow, createProduct } from "./services";
+
+interface ProductsState {
+  rows: ProductRow[];
+  form: NewProduct;
+  errors: { [K in keyof NewProduct]?: string[] };
+  formError: string;
+  busy: boolean;
+  added: string;
+  uploads: number;
+}
+
+function blankForm(): NewProduct {
+  return { title: "", description: "", price: "", cover: undefined, file: undefined };
+}
+
+function onCreate(state: ProductsState) {
+  state.busy = true;
+  state.errors = {};
+  state.formError = "";
+  state.added = "";
+
+  try {
+    let title = state.form.title.trim();
+    state.rows = createProduct(state.form);
+    state.form = blankForm();
+    state.added = title;
+    state.uploads++;
+  } catch (err: any) {
+    state.errors = err.errors ?? {};
+    state.formError = err.errors ? "" : err.message;
+  }
+
+  state.busy = false;
+}
+
+<html lang="en" class="page-admin-products" (
+  initial: ProductRow[],
+  private state: ProductsState = { rows: initial, form: blankForm(), errors: {}, formError: "", busy: false, added: "", uploads: 0 },
+)>
+  <head>
+    <title>Products · bytestall</title>
+    <link rel="icon" type="image/svg+xml" href={favicon} />
+  </head>
+  <body>
+    <AdminLayout active="products">
+      <div class="stack is-xl">
+        <h1>Products</h1>
+
+        <div class="products-cols">
+          <section class="card">
+            <div class="card-head">
+              <h2>In the store</h2>
+            </div>
+            <div class="card-body products-wrap">
+              <table class="products-table">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>Product</th>
+                    <th class="products-num">Price</th>
+                    <th class="products-num">Sales</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr e:for={p of state.rows}>
+                    <td><img class="products-thumb" src={coverUrl(p)} alt="" width="600" height="800"></td>
+                    <td>
+                      <a class="link-action" href={`/products/${p.slug}`}>{p.title}</a>
+                      <div class="products-file">{fileLabel(p.fileType)} · {formatSize(p.fileSize)}<span class="products-file-name"> · {p.fileName}</span></div>
+                    </td>
+                    <td class="products-num">{formatPrice(p.priceCents)}</td>
+                    <td class="products-num">{p.sales}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="card-head">
+              <h2>Upload a product</h2>
+            </div>
+            <div class="card-body">
+              <form class="stack" onsubmit={() => onCreate(state)}>
+                <div e:if={state.added} class="callout is-success" role="status">
+                  <p class="callout-title">{state.added} is on sale</p>
+                </div>
+
+                <p e:if={state.formError} class="callout is-danger" role="alert">{state.formError}</p>
+
+                <div class="field">
+                  <label for="title">Title</label>
+                  <input id="title" value={state.form.title} class={[state.errors.title && "is-error"]} placeholder="e.g. Moodboard Kit">
+                  <p e:if={state.errors.title} class="error">{state.errors.title!.join(" ")}</p>
+                </div>
+
+                <div class="field">
+                  <label for="description">Description</label>
+                  <textarea id="description" rows={4} value={state.form.description} class={[state.errors.description && "is-error"]}></textarea>
+                  <p e:if={state.errors.description} class="error">{state.errors.description!.join(" ")}</p>
+                </div>
+
+                <div class="field">
+                  <label for="price">Price in USD</label>
+                  <input id="price" inputmode="decimal" value={state.form.price} class={[state.errors.price && "is-error"]} placeholder="e.g. 24">
+                  <p e:if={state.errors.price} class="error">{state.errors.price!.join(" ")}</p>
+                </div>
+
+                <!-- Keyed on the upload count, so a finished upload re-renders the file inputs empty. -->
+                <div e:for={batch of [{ id: `upload-${state.uploads}` }]} class="stack">
+                  <div class="field">
+                    <label for="cover">Cover image</label>
+                    <input id="cover" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" value={state.form.cover}>
+                    <p e:if={state.errors.cover} class="error">{state.errors.cover!.join(" ")}</p>
+                    <p e:else class="hint">PNG, JPEG, WebP or SVG, 3:4 looks best.</p>
+                  </div>
+
+                  <div class="field">
+                    <label for="file">File</label>
+                    <input id="file" type="file" accept=".pdf,.zip,application/pdf,application/zip" value={state.form.file}>
+                    <p e:if={state.errors.file} class="error">{state.errors.file!.join(" ")}</p>
+                    <p e:else class="hint">The PDF or ZIP the buyer downloads, up to 25 MB.</p>
+                  </div>
+                </div>
+
+                <button type="submit" class={["is-primary", state.busy && "is-loading"]} disabled={state.busy}>Put it on sale</button>
+              </form>
+            </div>
+          </section>
+        </div>
+      </div>
+    </AdminLayout>
+  </body>
+</html>

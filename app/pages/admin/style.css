@@ -1,0 +1,196 @@
+@import "#app/shared/styles/page.css";
+
+.dash-head {
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.dash-stats {
+  display: grid;
+  grid-template-columns: 2fr repeat(4, 1fr);
+  gap: var(--space-4);
+}
+
+.dash-stat {
+  padding: var(--space-5);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  background: var(--bg-elevated);
+}
+
+.dash-stat-label {
+  font-size: var(--text-sm);
+  color: var(--ink-dim);
+}
+
+.dash-stat-value {
+  font-size: var(--text-3xl);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-none);
+  letter-spacing: var(--tracking-tight);
+}
+
+.dash-stat.is-hero .dash-stat-value {
+  font-size: var(--text-5xl);
+}
+
+.dash-stat-sub {
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+}
+
+.dash-live .pill-dot {
+  animation: dash-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes dash-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--success) 45%, transparent);
+  }
+
+  50% {
+    box-shadow: 0 0 0 5px color-mix(in oklab, var(--success) 0%, transparent);
+  }
+}
+
+.dash-cols {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-8);
+  align-items: start;
+}
+
+.dash-table-wrap {
+  overflow-x: auto;
+}
+
+.dash-table-wrap table {
+  width: 100%;
+}
+
+.dash-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.dash-bar {
+  display: block;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--bg-muted);
+}
+
+.dash-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--accent);
+  transition: width 400ms ease;
+}
+
+.dash-bar-cell {
+  width: 30%;
+}
+
+.dash-buyer {
+  max-width: 16rem;
+}
+
+.dash-when {
+  font-size: var(--text-sm);
+  color: var(--ink-dim);
+  white-space: nowrap;
+}
+
+@media (max-width: 64rem) {
+  .dash-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dash-stat.is-hero {
+    grid-column: 1 / -1;
+  }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dash-live .pill-dot {
+    animation: none;
+  }
+}
+
+.dash-table-wrap td {
+  vertical-align: middle;
+}
+
+.dash-used-label {
+  display: none;
+}
+
+/* On a phone the sales table becomes a list: product and amount, then the
+   buyer and downloads, then the time and the resend button. */
+@media (max-width: 45rem) {
+  .dash-bar-cell {
+    display: none;
+  }
+
+  .dash-sales thead {
+    display: none;
+  }
+
+  .dash-sales,
+  .dash-sales tbody {
+    display: block;
+  }
+
+  .dash-sales tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "product amount"
+      "buyer used"
+      "when action";
+    gap: var(--space-1) var(--space-3);
+    padding-block: var(--space-3);
+  }
+
+  .dash-sales td {
+    padding: 0;
+  }
+
+  .dash-sales .dash-product {
+    grid-area: product;
+    font-weight: var(--weight-semibold);
+  }
+
+  .dash-sales .dash-amount {
+    grid-area: amount;
+    font-weight: var(--weight-semibold);
+  }
+
+  .dash-sales .dash-buyer {
+    grid-area: buyer;
+    max-width: none;
+    color: var(--ink-soft);
+  }
+
+  .dash-sales .dash-used {
+    grid-area: used;
+    color: var(--ink-soft);
+  }
+
+  .dash-sales .dash-when {
+    grid-area: when;
+    align-self: center;
+  }
+
+  .dash-sales .dash-action {
+    grid-area: action;
+  }
+
+  .dash-used-label {
+    display: inline;
+  }
+}

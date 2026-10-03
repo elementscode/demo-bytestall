@@ -1,0 +1,46 @@
+import "./style.css";
+import favicon from "#app/shared/assets/favicons/favicon.svg";
+import { StoreLayout } from "#app/shared/templates/store-layout";
+import { DownloadItem } from "#app/shared/templates/download-item";
+import { formatDate, formatPrice } from "#app/shared/services/catalog";
+import type { DownloadLink } from "#app/shared/services/links";
+
+interface LibraryEntry extends DownloadLink {
+  id: string;
+}
+
+function entries(links: DownloadLink[]): LibraryEntry[] {
+  return links.map((l) => ({ ...l, id: l.orderId }));
+}
+
+<html lang="en" class="page-library" (email: string, links: DownloadLink[])>
+  <head>
+    <title>Your library · bytestall</title>
+    <meta name="robots" content="noindex">
+    <link rel="icon" type="image/svg+xml" href={favicon} />
+  </head>
+  <body>
+    <StoreLayout isAdmin={false}>
+      <div class="page-shell is-form receipt-shell stack is-xl">
+        <div class="stack is-sm">
+          <h1>Your library</h1>
+          <p class="lede">
+            Everything bought with <strong class="library-email">{email}</strong>:
+            {links.length} {links.length === 1 ? "purchase" : "purchases"}. Each download link works five times over thirty days.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <ul class="library-list stack is-lg">
+              <li e:for={entry of entries(links)} class="stack is-sm">
+                <p class="library-bought">Bought {formatDate(entry.paidAt)} · {formatPrice(entry.amountCents)}</p>
+                <DownloadItem link={entry} />
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </StoreLayout>
+  </body>
+</html>

@@ -1,0 +1,56 @@
+@import "#app/shared/styles/page.css";
+
+.product-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  gap: var(--space-16);
+  align-items: start;
+  padding-block: var(--space-12) var(--space-20);
+}
+
+.product-cover {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 4;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+}
+
+.product-back {
+  font-size: var(--text-sm);
+}
+
+.product-title {
+  font-size: var(--text-4xl);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+}
+
+.product-price {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+.product-specs {
+  font-size: var(--text-sm);
+  color: var(--ink-dim);
+}
+
+@media (max-width: 45rem) {
+  .product-layout {
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+    padding-block: var(--space-6) var(--space-12);
+  }
+
+  .product-cover {
+    max-width: 18rem;
+    margin-inline: auto;
+  }
+
+  .product-title {
+    font-size: var(--text-3xl);
+  }
+}

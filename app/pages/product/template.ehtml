@@ -1,0 +1,137 @@
+import "./style.css";
+import favicon from "#app/shared/assets/favicons/favicon.svg";
+import { redirect, sql, ValidationError } from "@elements/app";
+import { StoreLayout } from "#app/shared/templates/store-layout";
+import { Product, coverUrl, fileLabel, formatPrice, productKind } from "#app/shared/services/catalog";
+import { DOWNLOAD_DAYS, DOWNLOAD_LIMIT } from "#app/shared/services/downloads";
+import { CheckoutItem, startCheckout } from "#app/shared/checkout";
+
+export interface BuyRequest {
+  productId: string;
+  email: string;
+}
+
+export function isEmail(email: string): boolean {
+  return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
+}
+
+/**
+ * Opens a pending order for one product. The price is read from the product
+ * row, never taken from the browser.
+ */
+export function openOrder(req: BuyRequest): CheckoutItem {
+  let email = req.email.trim().toLowerCase();
+
+  if (!isEmail(email)) {
+    throw new ValidationError("Enter the email address to send your download to.");
+  }
+
+  let product = sql<{ id: string; slug: string; title: string; priceCents: number }>(`
+    select id, slug, title, priceCents from products where id = ${req.productId}
+  `).firstOrThrow("product not found");
+
+  let order = sql<{ id: string }>(`
+    insert into orders (email, productId, amountCents)
+         values (${email}, ${product.id}, ${product.priceCents})
+      returning id
+  `).firstOrThrow();
+
+  return {
+    orderId: order.id,
+    email,
+    title: product.title,
+    slug: product.slug,
+    amountCents: product.priceCents,
+  };
+}
+
+/**
+ * Opens a pending order and returns the checkout url: Stripe Checkout, or the
+ * in-app test checkout in development without a key.
+ * @rpc
+ */
+export async function buy(req: BuyRequest): Promise<string> {
+  return await startCheckout(openOrder(req));
+}
+
+interface BuyForm {
+  email: string;
+  error: string;
+  busy: boolean;
+}
+
+async function onBuy(productId: string, form: BuyForm) {
+  form.error = "";
+  form.busy = true;
+
+  try {
+    redirect(await buy({ productId, email: form.email }));
+  } catch (err: any) {
+    form.error = err.message;
+    form.busy = false;
+  }
+}
+
+<html lang="en" class="page-product" (
+  product: Product,
+  isAdmin: boolean,
+  private form: BuyForm = { email: "", error: "", busy: false },
+)>
+  <head>
+    <title>{product.title} · bytestall</title>
+    <meta name="description" content={product.description}>
+    <link rel="icon" type="image/svg+xml" href={favicon} />
+  </head>
+  <body>
+    <StoreLayout {isAdmin}>
+      <div class="page-shell product-layout">
+        <img class="product-cover" src={coverUrl(product)} alt={`Cover of ${product.title}`} width="600" height="800">
+
+        <div class="stack is-xl">
+          <a class="product-back link-muted" href="/">← All products</a>
+
+          <div class="stack is-sm">
+            <p class="eyebrow">{productKind(product.fileType)}</p>
+            <h1 class="product-title text-balance">{product.title}</h1>
+            <p class="product-price">{formatPrice(product.priceCents)}</p>
+          </div>
+
+          <p class="lede text-pretty">{product.description}</p>
+
+          <p class="product-specs">
+            {fileLabel(product.fileType)} · {product.fileName}
+          </p>
+
+          <div class="card">
+            <div class="card-body">
+              <form class="stack" onsubmit={() => onBuy(product.id, form)}>
+                <div class="field">
+                  <label for="email">Email for your download</label>
+                  <input id="email"
+                         name="email"
+                         type="email"
+                         value={form.email}
+                         autocomplete="email"
+                         autocapitalize="none"
+                         spellcheck={false}
+                         placeholder="you@example.com"
+                         class={[form.error && "is-error"]}
+                         required>
+                  <p e:if={form.error} class="error" role="alert">{form.error}</p>
+                </div>
+
+                <button type="submit" class={["is-primary", "is-lg", "is-block", form.busy && "is-loading"]} disabled={form.busy}>
+                  Buy for {formatPrice(product.priceCents)}
+                </button>
+
+                <p class="hint">
+                  Pay by card on Stripe. No account needed. Your link works {DOWNLOAD_LIMIT} times over {DOWNLOAD_DAYS} days.
+                </p>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </StoreLayout>
+  </body>
+</html>
