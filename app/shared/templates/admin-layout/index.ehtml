@@ -1,0 +1,49 @@
+import "./style.css";
+import { redirect, session } from "@elements/app";
+import { signout } from "#app/shared/services/auth";
+
+function onSignout() {
+  signout();
+  redirect("/signin");
+}
+
+<AdminLayout (active: string)>
+  <div class="app admin">
+    <header class="admin-header">
+      <div class="page-shell is-wide row admin-header-inner">
+        <div class="cluster is-md">
+          <a class="admin-brand row" href="/admin">
+            <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M3 9l1.6-5h14.8L21 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+              <path d="M3 9h18v2.5a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0z" fill="currentColor"/>
+              <path d="M5 14v6h14v-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            </svg>
+            bytestall
+          </a>
+          <span class="pill">Creator</span>
+        </div>
+
+        <div class="cluster is-md">
+          <span class="text-sm admin-user">{session.get("userName")}</span>
+          <a class="link-muted text-sm" href="/">View store</a>
+          <button type="button" class="is-ghost is-sm" onclick={() => onSignout()}>Sign out</button>
+        </div>
+      </div>
+    </header>
+
+    <nav class="admin-tabs tabs">
+      <div class="page-shell is-wide">
+        <div class="tab-list">
+          <a href="/admin" class={["tab", active === "dashboard" && "is-active"]}>Sales</a>
+          <a href="/admin/products" class={["tab", active === "products" && "is-active"]}>Products</a>
+        </div>
+      </div>
+    </nav>
+
+    <main class="app-main">
+      <div class="page-shell is-wide admin-main">
+        <slot/>
+      </div>
+    </main>
+  </div>
+</AdminLayout>

@@ -1,0 +1,94 @@
+import "./style.css";
+import favicon from "#app/shared/assets/favicons/favicon.svg";
+import { redirect } from "@elements/app";
+import { StoreLayout } from "#app/shared/templates/store-layout";
+import { signin } from "#app/shared/services/auth";
+
+// The seeded creator account (app/migrations/*-demo-store.migration.sql).
+// It only exists in development.
+const DEMO_EMAIL = "creator@bytestall.dev";
+const DEMO_PASSWORD = "bytestall";
+
+interface SigninForm {
+  email: string;
+  password: string;
+  error: string;
+}
+
+function onSubmit(form: SigninForm) {
+  try {
+    signin(form.email, form.password);
+    form.error = "";
+    redirect("/admin");
+  } catch (err: any) {
+    form.error = err.message;
+  }
+}
+
+function useDemo(form: SigninForm) {
+  form.email = DEMO_EMAIL;
+  form.password = DEMO_PASSWORD;
+}
+
+<html lang="en" class="page-signin" (
+  private form: SigninForm = { email: "", password: "", error: "" },
+)>
+  <head>
+    <title>Creator sign in · bytestall</title>
+    <link rel="icon" type="image/svg+xml" href={favicon} />
+  </head>
+  <body>
+    <StoreLayout isAdmin={false}>
+      <div class="page-shell is-form signin-shell">
+        <div class="stack is-lg">
+          <div class="stack is-sm">
+            <p class="eyebrow">Creator</p>
+            <h1>Sign in to your store</h1>
+          </div>
+
+          <div class="callout is-info signin-demo">
+            <p class="callout-title">Demo creator account</p>
+            <div class="callout-body stack is-sm">
+              <p>Email <code>{DEMO_EMAIL}</code> · password <code>{DEMO_PASSWORD}</code></p>
+              <div>
+                <button type="button" class="is-sm" onclick={() => useDemo(form)}>Fill in the demo login</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-body">
+              <form class="stack" onsubmit={() => onSubmit(form)}>
+                <p e:if={form.error} class="callout is-danger" role="alert">{form.error}</p>
+
+                <div class="field">
+                  <label for="email">Email</label>
+                  <input id="email"
+                         name="email"
+                         type="email"
+                         value={form.email}
+                         autocomplete="email"
+                         autocapitalize="none"
+                         spellcheck={false}
+                         required>
+                </div>
+
+                <div class="field">
+                  <label for="password">Password</label>
+                  <input id="password"
+                         name="password"
+                         type="password"
+                         value={form.password}
+                         autocomplete="current-password"
+                         required>
+                </div>
+
+                <button type="submit" class="is-primary is-block">Sign in</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </StoreLayout>
+  </body>
+</html>

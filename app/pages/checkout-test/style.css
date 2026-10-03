@@ -1,0 +1,39 @@
+@import "#app/shared/styles/page.css";
+@import "#app/shared/styles/receipt.css";
+
+.test-email {
+  overflow-wrap: anywhere;
+}
+
+.test-line {
+  flex: 1;
+  min-width: 0;
+}
+
+.test-amount {
+  flex: none;
+  font-weight: var(--weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+.test-total {
+  justify-content: space-between;
+  align-items: baseline;
+  padding-block-start: var(--space-4);
+  border-top: 1px solid var(--rule-soft);
+  font-weight: var(--weight-semibold);
+}
+
+.test-total-amount {
+  font-size: var(--text-2xl);
+  font-variant-numeric: tabular-nums;
+}
+
+.test-cancel {
+  align-self: center;
+  font-size: var(--text-sm);
+}
+
+.page-checkout-test .callout code {
+  overflow-wrap: anywhere;
+}

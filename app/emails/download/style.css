@@ -1,0 +1,24 @@
+@import "#app/shared/styles/email.css";
+
+.email.download .brand {
+  font-family: Menlo, Consolas, monospace;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #b8452a;
+}
+
+.email.download .cta {
+  display: inline-block;
+  padding: 12px 22px;
+  border-radius: 8px;
+  background: #b8452a;
+  color: #ffffff;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.email.download .terms {
+  font-size: 14px;
+  color: #5b5549;
+}

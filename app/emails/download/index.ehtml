@@ -1,0 +1,43 @@
+import "./style.css";
+
+function formatExpiry(d: Date): string {
+  return d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+}
+
+/**
+ * The download link for one order, and the buyer's library link.
+ *
+ * @email
+ */
+<html (
+  productTitle: string,
+  downloadUrl: string,
+  libraryUrl: string,
+  expiresAt: Date,
+  limit: number,
+)>
+  <body class="email download">
+    <div class="email-wrap">
+      <p class="brand">BYTESTALL</p>
+
+      <h1>Your download is ready</h1>
+
+      <p>Thanks for buying <strong>{productTitle}</strong>. Your file is one click away.</p>
+
+      <p><a class="cta" href={downloadUrl}>Download {productTitle}</a></p>
+
+      <p class="terms">
+        This link works {limit} times and expires on {formatExpiry(expiresAt)}.
+      </p>
+
+      <p>
+        Everything you have bought with this email address is in
+        <a href={libraryUrl}>your library</a>.
+      </p>
+
+      <div class="email-footer">
+        <p>Sold by Juno Park Studio on bytestall. Reply to this email if something is wrong with your file.</p>
+      </div>
+    </div>
+  </body>
+</html>

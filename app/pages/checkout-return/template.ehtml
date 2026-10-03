@@ -1,0 +1,46 @@
+import "./style.css";
+import favicon from "#app/shared/assets/favicons/favicon.svg";
+import { StoreLayout } from "#app/shared/templates/store-layout";
+import { DownloadItem } from "#app/shared/templates/download-item";
+import type { DownloadLink } from "#app/shared/services/links";
+
+<html lang="en" class="page-checkout-return" (link: DownloadLink | null, libraryUrl: string)>
+  <head>
+    <title>Thank you · bytestall</title>
+    <meta name="robots" content="noindex">
+    <link rel="icon" type="image/svg+xml" href={favicon} />
+  </head>
+  <body>
+    <StoreLayout isAdmin={false}>
+      <div class="page-shell is-form receipt-shell stack is-xl">
+        <div e:if={link} class="stack is-xl">
+          <div class="stack is-md">
+            <span class="thanks-mark">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M5 12l5 5L20 7"/>
+              </svg>
+            </span>
+            <h1>Payment received</h1>
+            <p class="lede">We've emailed your download link to <strong>{link!.email}</strong>. You can also download it right now.</p>
+          </div>
+
+          <div class="card">
+            <div class="card-body">
+              <DownloadItem link={link!} />
+            </div>
+          </div>
+
+          <p class="receipt-note">
+            <a class="link-action" href={libraryUrl}>Your library</a> lists everything you've bought with this email.
+          </p>
+        </div>
+
+        <div e:else class="stack is-md">
+          <h1>Payment processing</h1>
+          <p class="lede">Stripe hasn't confirmed your payment yet. Your download link will arrive by email as soon as it does.</p>
+          <a class="link-action" href="/">Back to the shop</a>
+        </div>
+      </div>
+    </StoreLayout>
+  </body>
+</html>
