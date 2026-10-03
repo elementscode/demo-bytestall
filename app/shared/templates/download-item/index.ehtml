@@ -1,0 +1,50 @@
+import "./style.css";
+import { coverUrl, fileLabel, formatDate } from "#app/shared/services/catalog";
+import { DOWNLOAD_LIMIT, downloadsLeft, linkState } from "#app/shared/services/downloads";
+import type { DownloadLink } from "#app/shared/services/links";
+
+function onDownload(link: DownloadLink) {
+  // The file route counts the download; this keeps the number on screen in
+  // step without a reload.
+  link.downloadCount++;
+}
+
+<DownloadItem (link: DownloadLink)>
+  <div class="receipt-item row">
+    <img class="receipt-cover"
+         src={coverUrl({ id: link.productId, coverHash: link.coverHash })}
+         alt={`Cover of ${link.productTitle}`}
+         width="600"
+         height="800">
+
+    <div class="stack is-sm">
+      <h2>{link.productTitle}</h2>
+
+      <div e:switch={linkState(link)}>
+        <div e:case="ready" class="stack is-sm">
+          <div class="download-item-actions cluster">
+            <a class="button is-primary"
+               href={`/download/${link.downloadToken}/file`}
+               download={link.fileName}
+               onclick={() => onDownload(link)}>
+              Download {fileLabel(link.fileType)}
+            </a>
+          </div>
+          <p class="receipt-note">
+            {downloadsLeft(link)} of {DOWNLOAD_LIMIT} downloads left · expires {formatDate(link.expiresAt)}
+          </p>
+        </div>
+
+        <p e:case="used" class="receipt-note">
+          <span class="pill is-warning">Used {DOWNLOAD_LIMIT} of {DOWNLOAD_LIMIT}</span>
+          Reply to your download email and the creator will send a fresh link.
+        </p>
+
+        <p e:case="expired" class="receipt-note">
+          <span class="pill is-warning">Expired {formatDate(link.expiresAt)}</span>
+          Reply to your download email and the creator will send a fresh link.
+        </p>
+      </div>
+    </div>
+  </div>
+</DownloadItem>

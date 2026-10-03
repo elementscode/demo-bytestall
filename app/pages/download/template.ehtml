@@ -1,0 +1,30 @@
+import "./style.css";
+import favicon from "#app/shared/assets/favicons/favicon.svg";
+import { StoreLayout } from "#app/shared/templates/store-layout";
+import { DownloadItem } from "#app/shared/templates/download-item";
+import type { DownloadLink } from "#app/shared/services/links";
+
+<html lang="en" class="page-download" (link: DownloadLink, libraryUrl: string)>
+  <head>
+    <title>Download {link.productTitle} · bytestall</title>
+    <meta name="robots" content="noindex">
+    <link rel="icon" type="image/svg+xml" href={favicon} />
+  </head>
+  <body>
+    <StoreLayout isAdmin={false}>
+      <div class="page-shell is-form receipt-shell stack is-xl">
+        <h1>Your download</h1>
+
+        <div class="card">
+          <div class="card-body">
+            <DownloadItem {link} />
+          </div>
+        </div>
+
+        <p class="receipt-note">
+          Bought with {link.email}. <a class="link-action" href={libraryUrl}>See everything you've bought</a>
+        </p>
+      </div>
+    </StoreLayout>
+  </body>
+</html>

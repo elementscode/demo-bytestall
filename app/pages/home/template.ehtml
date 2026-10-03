@@ -1,0 +1,36 @@
+import "./style.css";
+import favicon from "#app/shared/assets/favicons/favicon.svg";
+import { StoreLayout } from "#app/shared/templates/store-layout";
+import { Product, coverUrl, formatPrice, productKind } from "#app/shared/services/catalog";
+
+<html lang="en" class="page-home" (products: Product[], isAdmin: boolean)>
+  <head>
+    <title>bytestall: templates and ebooks by Juno Park Studio</title>
+    <meta name="description" content="Design templates and ebooks for independent designers. Pay once, download instantly.">
+    <link rel="icon" type="image/svg+xml" href={favicon} />
+  </head>
+  <body>
+    <StoreLayout {isAdmin}>
+      <div class="page-shell">
+        <div class="page-hero shop-hero">
+          <p class="eyebrow">Juno Park Studio</p>
+          <h1 class="display text-balance">Templates and ebooks for independent designers.</h1>
+          <p class="lede">Pay once with an email and a card. Your download link arrives in seconds, no account needed.</p>
+        </div>
+
+        <ul class="shop-grid">
+          <li e:for={p of products}>
+            <a class="shop-item stack is-sm" href={`/products/${p.slug}`}>
+              <img class="shop-cover" src={coverUrl(p)} alt={`Cover of ${p.title}`} width="600" height="800">
+              <h2>{p.title}</h2>
+              <div class="shop-meta row">
+                <span>{productKind(p.fileType)}</span>
+                <span class="shop-price">{formatPrice(p.priceCents)}</span>
+              </div>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </StoreLayout>
+  </body>
+</html>

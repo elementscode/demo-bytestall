@@ -1,0 +1,6 @@
+@import "#app/shared/styles/receipt.css";
+
+.download-item-actions {
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}

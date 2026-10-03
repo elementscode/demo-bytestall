@@ -1,0 +1,15 @@
+@import "#app/shared/styles/page.css";
+
+.signin-shell {
+  padding-block: var(--space-16) var(--space-20);
+}
+
+.signin-demo code {
+  font-size: var(--text-sm);
+}
+
+@media (max-width: 45rem) {
+  .signin-shell {
+    padding-block: var(--space-8) var(--space-12);
+  }
+}

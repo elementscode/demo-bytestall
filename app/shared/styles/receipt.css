@@ -1,0 +1,37 @@
+.receipt-shell {
+  padding-block: var(--space-16) var(--space-20);
+}
+
+.receipt-item {
+  gap: var(--space-5);
+  align-items: center;
+}
+
+.receipt-cover {
+  flex: none;
+  width: 5.5rem;
+  height: auto;
+  aspect-ratio: 3 / 4;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+}
+
+.receipt-item h2 {
+  font-size: var(--text-lg);
+  line-height: var(--leading-snug);
+}
+
+.receipt-note {
+  font-size: var(--text-sm);
+  color: var(--ink-dim);
+}
+
+@media (max-width: 45rem) {
+  .receipt-shell {
+    padding-block: var(--space-8) var(--space-12);
+  }
+
+  .receipt-cover {
+    width: 4rem;
+  }
+}

@@ -1,0 +1,13 @@
+@import "#app/shared/styles/page.css";
+@import "#app/shared/styles/receipt.css";
+
+.thanks-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-12);
+  height: var(--space-12);
+  border-radius: var(--radius-full);
+  background: var(--success-100);
+  color: var(--success-700);
+}

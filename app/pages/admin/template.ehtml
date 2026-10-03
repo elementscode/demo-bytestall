@@ -1,0 +1,176 @@
+import "./style.css";
+import favicon from "#app/shared/assets/favicons/favicon.svg";
+import type { Listener } from "@elements/app";
+import { AdminLayout } from "#app/shared/templates/admin-layout";
+import { formatPrice } from "#app/shared/services/catalog";
+import { DOWNLOAD_LIMIT } from "#app/shared/services/downloads";
+import { Dashboard, ProductStat, Sale, fetchDashboard, resendDownload } from "#app/shared/services/sales";
+
+interface DashState {
+  value: Dashboard;
+  sentId: string;
+  busyId: string;
+  error: string;
+}
+
+export function money(cents: number): string {
+  return (cents / 100).toLocaleString("en-US", { style: "currency", currency: "USD" });
+}
+
+export function maxDownloads(products: ProductStat[]): number {
+  return Math.max(1, ...products.map((p) => p.downloads));
+}
+
+function when(d: Date): string {
+  return d.toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+}
+
+function onRefresh(state: DashState) {
+  state.value = fetchDashboard();
+}
+
+function onResend(state: DashState, sale: Sale) {
+  state.busyId = sale.id;
+  state.error = "";
+
+  try {
+    state.value = resendDownload(sale.id);
+    state.sentId = sale.id;
+  } catch (err: any) {
+    state.error = err.message;
+  }
+
+  state.busyId = "";
+}
+
+<html lang="en" class="page-admin" (
+  initial: Dashboard,
+  listener: Listener<{ event: "refresh" }>,
+  private state: DashState = { value: initial, sentId: "", busyId: "", error: "" },
+) oninit={() => listener.on("notify", () => onRefresh(state))}>
+  <head>
+    <title>Sales · bytestall</title>
+    <link rel="icon" type="image/svg+xml" href={favicon} />
+  </head>
+  <body>
+    <AdminLayout active="dashboard">
+      <div class="stack is-xl">
+        <div class="dash-head row">
+          <h1>Sales</h1>
+          <span class="pill is-success dash-live">
+            <span class="pill-dot"></span>
+            Live
+          </span>
+        </div>
+
+        <div class="dash-stats">
+          <div class="dash-stat is-hero stack is-sm">
+            <span class="dash-stat-label">Total revenue</span>
+            <span class="dash-stat-value">{money(state.value.revenueCents)}</span>
+            <span class="dash-stat-sub">{money(state.value.revenueWeekCents)} in the last 7 days</span>
+          </div>
+
+          <div class="dash-stat stack is-sm">
+            <span class="dash-stat-label">Sales</span>
+            <span class="dash-stat-value">{state.value.salesCount.toLocaleString()}</span>
+            <span class="dash-stat-sub">{state.value.salesWeek} in the last 7 days</span>
+          </div>
+
+          <div class="dash-stat stack is-sm">
+            <span class="dash-stat-label">Average sale</span>
+            <span class="dash-stat-value">{money(state.value.salesCount ? Math.round(state.value.revenueCents / state.value.salesCount) : 0)}</span>
+            <span class="dash-stat-sub">per order</span>
+          </div>
+
+          <div class="dash-stat stack is-sm">
+            <span class="dash-stat-label">Downloads</span>
+            <span class="dash-stat-value">{state.value.downloads.toLocaleString()}</span>
+            <span class="dash-stat-sub">files served</span>
+          </div>
+
+          <div class="dash-stat stack is-sm">
+            <span class="dash-stat-label">Buyers</span>
+            <span class="dash-stat-value">{state.value.buyers.toLocaleString()}</span>
+            <span class="dash-stat-sub">unique emails</span>
+          </div>
+        </div>
+
+        <p e:if={state.error} class="callout is-danger" role="alert">{state.error}</p>
+
+        <div class="dash-cols">
+          <section class="card">
+            <div class="card-head">
+              <h2>By product</h2>
+            </div>
+            <div class="card-body dash-table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th class="dash-bar-cell">Downloads per product</th>
+                    <th class="dash-num">Sales</th>
+                    <th class="dash-num">Revenue</th>
+                    <th class="dash-num">Downloads</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr e:for={p of state.value.products}>
+                    <td>{p.title}</td>
+                    <td class="dash-bar-cell">
+                      <span class="dash-bar" role="img" aria-label={`${p.downloads} downloads`}>
+                        <span style={`width: ${(p.downloads / maxDownloads(state.value.products)) * 100}%`}></span>
+                      </span>
+                    </td>
+                    <td class="dash-num">{p.sales}</td>
+                    <td class="dash-num">{formatPrice(p.revenueCents)}</td>
+                    <td class="dash-num">{p.downloads}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="card-head">
+              <h2>Recent sales</h2>
+            </div>
+            <div class="card-body dash-table-wrap">
+              <table class="dash-sales">
+                <thead>
+                  <tr>
+                    <th>When</th>
+                    <th>Buyer</th>
+                    <th>Product</th>
+                    <th class="dash-num">Amount</th>
+                    <th class="dash-num">Link used</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr e:for={sale of state.value.sales}>
+                    <td class="dash-when">{when(sale.paidAt)}</td>
+                    <td class="dash-buyer truncate" title={sale.email}>{sale.email}</td>
+                    <td class="dash-product">{sale.productTitle}</td>
+                    <td class="dash-num dash-amount">{formatPrice(sale.amountCents)}</td>
+                    <td class="dash-num dash-used">{sale.downloadCount} / {DOWNLOAD_LIMIT}<span class="dash-used-label"> downloads</span></td>
+                    <td class="dash-num dash-action">
+                      <span e:if={state.sentId === sale.id} class="pill is-success">Sent</span>
+                      <button e:else
+                              type="button"
+                              class={["is-sm", state.busyId === sale.id && "is-loading"]}
+                              disabled={state.busyId === sale.id}
+                              title="Email a fresh link: 5 downloads, 30 days"
+                              onclick={() => onResend(state, sale)}>
+                        Resend email
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </div>
+    </AdminLayout>
+  </body>
+</html>
