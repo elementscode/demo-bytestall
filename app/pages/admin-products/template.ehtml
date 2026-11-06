@@ -18,11 +18,10 @@ interface ProductsState {
   formError: string;
   busy: boolean;
   added: string;
-  uploads: number;
 }
 
 function blankForm(): NewProduct {
-  return { title: "", description: "", price: "", cover: undefined, file: undefined };
+  return { title: "", description: "", price: "", cover: [], file: [] };
 }
 
 function onCreate(state: ProductsState) {
@@ -36,7 +35,6 @@ function onCreate(state: ProductsState) {
     state.rows = createProduct(state.form);
     state.form = blankForm();
     state.added = title;
-    state.uploads++;
   } catch (err: any) {
     state.errors = err.errors ?? {};
     state.formError = err.errors ? "" : err.message;
@@ -47,7 +45,7 @@ function onCreate(state: ProductsState) {
 
 <html lang="en" class="page-admin-products" (
   initial: ProductRow[],
-  private state: ProductsState = { rows: initial, form: blankForm(), errors: {}, formError: "", busy: false, added: "", uploads: 0 },
+  private state: ProductsState = { rows: initial, form: blankForm(), errors: {}, formError: "", busy: false, added: "" },
 )>
   <head>
     <title>Products · bytestall</title>
@@ -106,22 +104,13 @@ function onCreate(state: ProductsState) {
                   <Input value={state.form.price} placeholder="e.g. 24" attrs={{ inputmode: "decimal" }} />
                 </Field>
 
-                <!-- Keyed on the upload count, so a finished upload re-renders the file inputs empty. -->
-                <div e:for={batch of [{ id: `upload-${state.uploads}` }]} class="stack">
-                  <div class="field">
-                    <label for="cover">Cover image</label>
-                    <input id="cover" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" value={state.form.cover}>
-                    <p e:if={state.errors.cover} class="error">{state.errors.cover!.join(" ")}</p>
-                    <p e:else class="hint">PNG, JPEG, WebP or SVG, 3:4 looks best.</p>
-                  </div>
+                <Field label="Cover image" description="PNG, JPEG, WebP or SVG, 3:4 looks best." errors={state.errors.cover ?? []}>
+                  <Input type="file" files={state.form.cover} attrs={{ accept: "image/png,image/jpeg,image/webp,image/svg+xml" }} />
+                </Field>
 
-                  <div class="field">
-                    <label for="file">File</label>
-                    <input id="file" type="file" accept=".pdf,.zip,application/pdf,application/zip" value={state.form.file}>
-                    <p e:if={state.errors.file} class="error">{state.errors.file!.join(" ")}</p>
-                    <p e:else class="hint">The PDF or ZIP the buyer downloads, up to 25 MB.</p>
-                  </div>
-                </div>
+                <Field label="File" description="The PDF or ZIP the buyer downloads, up to 25 MB." errors={state.errors.file ?? []}>
+                  <Input type="file" files={state.form.file} attrs={{ accept: ".pdf,.zip,application/pdf,application/zip" }} />
+                </Field>
 
                 <Button type="submit" variant="primary" loading={state.busy}>Put it on sale</Button>
               </form>

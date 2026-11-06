@@ -17,8 +17,8 @@ export interface NewProduct {
   title: string;
   description: string;
   price: string;
-  cover?: File;
-  file?: File;
+  cover: File[];
+  file: File[];
 }
 
 const COVER_TYPES = new Set(["image/png", "image/jpeg", "image/webp", "image/svg+xml"]);
@@ -79,7 +79,9 @@ export function createProduct(form: NewProduct): ProductRow[] {
   let title = form.title.trim();
   let description = form.description.trim();
   let priceCents = parsePrice(form.price);
-  let fileType = form.file ? sniffFileType(form.file.data) : "";
+  let cover = form.cover[0];
+  let file = form.file[0];
+  let fileType = file ? sniffFileType(file.data) : "";
 
   if (!title) {
     errors.title = ["Give the product a title."];
@@ -93,19 +95,19 @@ export function createProduct(form: NewProduct): ProductRow[] {
     errors.price = ["Enter a price of at least $0.50, like 24 or 24.50."];
   }
 
-  if (!form.cover) {
+  if (!cover) {
     errors.cover = ["Choose a cover image."];
-  } else if (!COVER_TYPES.has(form.cover.contentType)) {
+  } else if (!COVER_TYPES.has(cover.contentType)) {
     errors.cover = ["The cover must be a PNG, JPEG, WebP or SVG image."];
-  } else if (form.cover.size > MAX_COVER) {
+  } else if (cover.size > MAX_COVER) {
     errors.cover = ["The cover must be under 5 MB."];
   }
 
-  if (!form.file) {
+  if (!file) {
     errors.file = ["Choose the PDF or ZIP the buyer downloads."];
   } else if (!fileType) {
     errors.file = ["The file must be a PDF or a ZIP."];
-  } else if (form.file.size > MAX_FILE) {
+  } else if (file.size > MAX_FILE) {
     errors.file = ["The file must be under 25 MB."];
   }
 
@@ -123,8 +125,8 @@ export function createProduct(form: NewProduct): ProductRow[] {
 
   sql(`
     insert into products (slug, title, description, priceCents, coverType, coverData, fileName, fileType, fileSize, fileData)
-         values (${slug}, ${title}, ${description}, ${priceCents}, ${form.cover!.contentType}, ${form.cover!.data},
-                 ${form.file!.name}, ${fileType}, ${form.file!.size}, ${form.file!.data})
+         values (${slug}, ${title}, ${description}, ${priceCents}, ${cover!.contentType}, ${cover!.data},
+                 ${file!.name}, ${fileType}, ${file!.size}, ${file!.data})
   `);
 
   return listProductRows();
