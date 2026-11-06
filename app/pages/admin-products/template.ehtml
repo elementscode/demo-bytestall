@@ -1,5 +1,12 @@
 import "./style.css";
 import favicon from "#app/shared/assets/favicons/favicon.svg";
+import { Alert } from "@elements/ui/alert";
+import { Button } from "@elements/ui/button";
+import { Card, CardContent } from "@elements/ui/card";
+import { Field } from "@elements/ui/field";
+import { Input } from "@elements/ui/input";
+import { Table, TableCell, TableHead } from "@elements/ui/table";
+import { Textarea } from "@elements/ui/textarea";
 import { AdminLayout } from "#app/shared/templates/admin-layout";
 import { coverUrl, fileLabel, formatPrice, formatSize } from "#app/shared/services/catalog";
 import { NewProduct, ProductRow, createProduct } from "./services";
@@ -52,64 +59,52 @@ function onCreate(state: ProductsState) {
         <h1>Products</h1>
 
         <div class="products-cols">
-          <section class="card">
-            <div class="card-head">
-              <h2>In the store</h2>
-            </div>
-            <div class="card-body products-wrap">
-              <table class="products-table">
-                <thead>
-                  <tr>
-                    <th></th>
-                    <th>Product</th>
-                    <th class="products-num">Price</th>
-                    <th class="products-num">Sales</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr e:for={p of state.rows}>
-                    <td><img class="products-thumb" src={coverUrl(p)} alt="" width="600" height="800"></td>
-                    <td>
-                      <a class="link-action" href={`/products/${p.slug}`}>{p.title}</a>
-                      <div class="products-file">{fileLabel(p.fileType)} · {formatSize(p.fileSize)}<span class="products-file-name"> · {p.fileName}</span></div>
-                    </td>
-                    <td class="products-num">{formatPrice(p.priceCents)}</td>
-                    <td class="products-num">{p.sales}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </section>
+          <Card title="In the store" level={2}>
+            <CardContent>
+              <Table label="Products in the store">
+                <table>
+                  <thead>
+                    <tr>
+                      <TableHead></TableHead>
+                      <TableHead>Product</TableHead>
+                      <TableHead align="end">Price</TableHead>
+                      <TableHead align="end">Sales</TableHead>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr e:for={p of state.rows}>
+                      <TableCell><img class="products-thumb" src={coverUrl(p)} alt="" width="600" height="800"></TableCell>
+                      <TableCell class="products-name">
+                        <a class="link-action" href={`/products/${p.slug}`}>{p.title}</a>
+                        <div class="products-file">{fileLabel(p.fileType)} · {formatSize(p.fileSize)}<span class="products-file-name"> · {p.fileName}</span></div>
+                      </TableCell>
+                      <TableCell align="end">{formatPrice(p.priceCents)}</TableCell>
+                      <TableCell align="end">{p.sales}</TableCell>
+                    </tr>
+                  </tbody>
+                </table>
+              </Table>
+            </CardContent>
+          </Card>
 
-          <section class="card">
-            <div class="card-head">
-              <h2>Upload a product</h2>
-            </div>
-            <div class="card-body">
+          <Card title="Upload a product" level={2}>
+            <CardContent>
               <form class="stack" onsubmit={() => onCreate(state)}>
-                <div e:if={state.added} class="callout is-success" role="status">
-                  <p class="callout-title">{state.added} is on sale</p>
-                </div>
+                <Alert e:if={state.added} variant="success" role="status" title={`${state.added} is on sale`} />
 
-                <p e:if={state.formError} class="callout is-danger" role="alert">{state.formError}</p>
+                <Alert e:if={state.formError} variant="danger" description={state.formError} />
 
-                <div class="field">
-                  <label for="title">Title</label>
-                  <input id="title" value={state.form.title} class={[state.errors.title && "is-error"]} placeholder="e.g. Moodboard Kit">
-                  <p e:if={state.errors.title} class="error">{state.errors.title!.join(" ")}</p>
-                </div>
+                <Field label="Title" errors={state.errors.title ?? []}>
+                  <Input value={state.form.title} placeholder="e.g. Moodboard Kit" />
+                </Field>
 
-                <div class="field">
-                  <label for="description">Description</label>
-                  <textarea id="description" rows={4} value={state.form.description} class={[state.errors.description && "is-error"]}></textarea>
-                  <p e:if={state.errors.description} class="error">{state.errors.description!.join(" ")}</p>
-                </div>
+                <Field label="Description" errors={state.errors.description ?? []}>
+                  <Textarea rows={4} value={state.form.description} />
+                </Field>
 
-                <div class="field">
-                  <label for="price">Price in USD</label>
-                  <input id="price" inputmode="decimal" value={state.form.price} class={[state.errors.price && "is-error"]} placeholder="e.g. 24">
-                  <p e:if={state.errors.price} class="error">{state.errors.price!.join(" ")}</p>
-                </div>
+                <Field label="Price in USD" errors={state.errors.price ?? []}>
+                  <Input value={state.form.price} placeholder="e.g. 24" attrs={{ inputmode: "decimal" }} />
+                </Field>
 
                 <!-- Keyed on the upload count, so a finished upload re-renders the file inputs empty. -->
                 <div e:for={batch of [{ id: `upload-${state.uploads}` }]} class="stack">
@@ -128,10 +123,10 @@ function onCreate(state: ProductsState) {
                   </div>
                 </div>
 
-                <button type="submit" class={["is-primary", state.busy && "is-loading"]} disabled={state.busy}>Put it on sale</button>
+                <Button type="submit" variant="primary" loading={state.busy}>Put it on sale</Button>
               </form>
-            </div>
-          </section>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </AdminLayout>
