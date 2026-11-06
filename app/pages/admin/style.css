@@ -12,13 +12,6 @@
   gap: var(--space-4);
 }
 
-.dash-stat {
-  padding: var(--space-5);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-lg);
-  background: var(--bg-elevated);
-}
-
 .dash-stat-label {
   font-size: var(--text-sm);
   color: var(--ink-dim);
@@ -59,20 +52,6 @@
   grid-template-columns: 1fr;
   gap: var(--space-8);
   align-items: start;
-}
-
-.dash-table-wrap {
-  overflow-x: auto;
-}
-
-.dash-table-wrap table {
-  width: 100%;
-}
-
-.dash-num {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
 }
 
 .dash-bar {
@@ -121,10 +100,6 @@
   }
 }
 
-.dash-table-wrap td {
-  vertical-align: middle;
-}
-
 .dash-used-label {
   display: none;
 }
@@ -134,6 +109,17 @@
 @media (max-width: 45rem) {
   .dash-bar-cell {
     display: none;
+  }
+
+  /* Tighter cards on a phone, so the tables fit without scrolling. */
+  .dash-cols .card {
+    --card-spacing: var(--space-3);
+    --item-padding-x: var(--space-1-5);
+  }
+
+  /* Titles wrap so the numbers stay on screen beside them. */
+  .dash-title {
+    white-space: normal;
   }
 
   .dash-sales thead {

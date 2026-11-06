@@ -1,6 +1,11 @@
 import "./style.css";
 import favicon from "#app/shared/assets/favicons/favicon.svg";
 import type { Listener } from "@elements/app";
+import { Alert } from "@elements/ui/alert";
+import { Badge } from "@elements/ui/badge";
+import { Button } from "@elements/ui/button";
+import { Card, CardContent } from "@elements/ui/card";
+import { Table, TableCell, TableHead } from "@elements/ui/table";
 import { AdminLayout } from "#app/shared/templates/admin-layout";
 import { formatPrice } from "#app/shared/services/catalog";
 import { DOWNLOAD_LIMIT } from "#app/shared/services/downloads";
@@ -57,118 +62,122 @@ function onResend(state: DashState, sale: Sale) {
       <div class="stack is-xl">
         <div class="dash-head row">
           <h1>Sales</h1>
-          <span class="pill is-success dash-live">
-            <span class="pill-dot"></span>
-            Live
-          </span>
+          <Badge variant="success" dot class="dash-live">Live</Badge>
         </div>
 
         <div class="dash-stats">
-          <div class="dash-stat is-hero stack is-sm">
-            <span class="dash-stat-label">Total revenue</span>
-            <span class="dash-stat-value">{money(state.value.revenueCents)}</span>
-            <span class="dash-stat-sub">{money(state.value.revenueWeekCents)} in the last 7 days</span>
-          </div>
+          <Card class="dash-stat is-hero">
+            <CardContent class="stack is-sm">
+              <span class="dash-stat-label">Total revenue</span>
+              <span class="dash-stat-value">{money(state.value.revenueCents)}</span>
+              <span class="dash-stat-sub">{money(state.value.revenueWeekCents)} in the last 7 days</span>
+            </CardContent>
+          </Card>
 
-          <div class="dash-stat stack is-sm">
-            <span class="dash-stat-label">Sales</span>
-            <span class="dash-stat-value">{state.value.salesCount.toLocaleString()}</span>
-            <span class="dash-stat-sub">{state.value.salesWeek} in the last 7 days</span>
-          </div>
+          <Card class="dash-stat">
+            <CardContent class="stack is-sm">
+              <span class="dash-stat-label">Sales</span>
+              <span class="dash-stat-value">{state.value.salesCount.toLocaleString()}</span>
+              <span class="dash-stat-sub">{state.value.salesWeek} in the last 7 days</span>
+            </CardContent>
+          </Card>
 
-          <div class="dash-stat stack is-sm">
-            <span class="dash-stat-label">Average sale</span>
-            <span class="dash-stat-value">{money(state.value.salesCount ? Math.round(state.value.revenueCents / state.value.salesCount) : 0)}</span>
-            <span class="dash-stat-sub">per order</span>
-          </div>
+          <Card class="dash-stat">
+            <CardContent class="stack is-sm">
+              <span class="dash-stat-label">Average sale</span>
+              <span class="dash-stat-value">{money(state.value.salesCount ? Math.round(state.value.revenueCents / state.value.salesCount) : 0)}</span>
+              <span class="dash-stat-sub">per order</span>
+            </CardContent>
+          </Card>
 
-          <div class="dash-stat stack is-sm">
-            <span class="dash-stat-label">Downloads</span>
-            <span class="dash-stat-value">{state.value.downloads.toLocaleString()}</span>
-            <span class="dash-stat-sub">files served</span>
-          </div>
+          <Card class="dash-stat">
+            <CardContent class="stack is-sm">
+              <span class="dash-stat-label">Downloads</span>
+              <span class="dash-stat-value">{state.value.downloads.toLocaleString()}</span>
+              <span class="dash-stat-sub">files served</span>
+            </CardContent>
+          </Card>
 
-          <div class="dash-stat stack is-sm">
-            <span class="dash-stat-label">Buyers</span>
-            <span class="dash-stat-value">{state.value.buyers.toLocaleString()}</span>
-            <span class="dash-stat-sub">unique emails</span>
-          </div>
+          <Card class="dash-stat">
+            <CardContent class="stack is-sm">
+              <span class="dash-stat-label">Buyers</span>
+              <span class="dash-stat-value">{state.value.buyers.toLocaleString()}</span>
+              <span class="dash-stat-sub">unique emails</span>
+            </CardContent>
+          </Card>
         </div>
 
-        <p e:if={state.error} class="callout is-danger" role="alert">{state.error}</p>
+        <Alert e:if={state.error} variant="danger" description={state.error} />
 
         <div class="dash-cols">
-          <section class="card">
-            <div class="card-head">
-              <h2>By product</h2>
-            </div>
-            <div class="card-body dash-table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Product</th>
-                    <th class="dash-bar-cell">Downloads per product</th>
-                    <th class="dash-num">Sales</th>
-                    <th class="dash-num">Revenue</th>
-                    <th class="dash-num">Downloads</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr e:for={p of state.value.products}>
-                    <td>{p.title}</td>
-                    <td class="dash-bar-cell">
-                      <span class="dash-bar" role="img" aria-label={`${p.downloads} downloads`}>
-                        <span style={`width: ${(p.downloads / maxDownloads(state.value.products)) * 100}%`}></span>
-                      </span>
-                    </td>
-                    <td class="dash-num">{p.sales}</td>
-                    <td class="dash-num">{formatPrice(p.revenueCents)}</td>
-                    <td class="dash-num">{p.downloads}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </section>
+          <Card title="By product" level={2}>
+            <CardContent>
+              <Table label="Sales by product">
+                <table>
+                  <thead>
+                    <tr>
+                      <TableHead>Product</TableHead>
+                      <TableHead class="dash-bar-cell">Downloads per product</TableHead>
+                      <TableHead align="end">Sales</TableHead>
+                      <TableHead align="end">Revenue</TableHead>
+                      <TableHead align="end">Downloads</TableHead>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr e:for={p of state.value.products}>
+                      <TableCell class="dash-title">{p.title}</TableCell>
+                      <TableCell class="dash-bar-cell">
+                        <span class="dash-bar" role="img" aria-label={`${p.downloads} downloads`}>
+                          <span style={`width: ${(p.downloads / maxDownloads(state.value.products)) * 100}%`}></span>
+                        </span>
+                      </TableCell>
+                      <TableCell align="end">{p.sales}</TableCell>
+                      <TableCell align="end">{formatPrice(p.revenueCents)}</TableCell>
+                      <TableCell align="end">{p.downloads}</TableCell>
+                    </tr>
+                  </tbody>
+                </table>
+              </Table>
+            </CardContent>
+          </Card>
 
-          <section class="card">
-            <div class="card-head">
-              <h2>Recent sales</h2>
-            </div>
-            <div class="card-body dash-table-wrap">
-              <table class="dash-sales">
-                <thead>
-                  <tr>
-                    <th>When</th>
-                    <th>Buyer</th>
-                    <th>Product</th>
-                    <th class="dash-num">Amount</th>
-                    <th class="dash-num">Link used</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr e:for={sale of state.value.sales}>
-                    <td class="dash-when">{when(sale.paidAt)}</td>
-                    <td class="dash-buyer truncate" title={sale.email}>{sale.email}</td>
-                    <td class="dash-product">{sale.productTitle}</td>
-                    <td class="dash-num dash-amount">{formatPrice(sale.amountCents)}</td>
-                    <td class="dash-num dash-used">{sale.downloadCount} / {DOWNLOAD_LIMIT}<span class="dash-used-label"> downloads</span></td>
-                    <td class="dash-num dash-action">
-                      <span e:if={state.sentId === sale.id} class="pill is-success">Sent</span>
-                      <button e:else
-                              type="button"
-                              class={["is-sm", state.busyId === sale.id && "is-loading"]}
-                              disabled={state.busyId === sale.id}
-                              title="Email a fresh link: 5 downloads, 30 days"
-                              onclick={() => onResend(state, sale)}>
-                        Resend email
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </section>
+          <Card title="Recent sales" level={2}>
+            <CardContent>
+              <Table label="Recent sales">
+                <table class="dash-sales">
+                  <thead>
+                    <tr>
+                      <TableHead>When</TableHead>
+                      <TableHead>Buyer</TableHead>
+                      <TableHead>Product</TableHead>
+                      <TableHead align="end">Amount</TableHead>
+                      <TableHead align="end">Link used</TableHead>
+                      <TableHead></TableHead>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr e:for={sale of state.value.sales}>
+                      <TableCell class="dash-when">{when(sale.paidAt)}</TableCell>
+                      <TableCell class="dash-buyer truncate" attrs={{ title: sale.email }}>{sale.email}</TableCell>
+                      <TableCell class="dash-product">{sale.productTitle}</TableCell>
+                      <TableCell align="end" class="dash-amount">{formatPrice(sale.amountCents)}</TableCell>
+                      <TableCell align="end" class="dash-used">{sale.downloadCount} / {DOWNLOAD_LIMIT}<span class="dash-used-label"> downloads</span></TableCell>
+                      <TableCell align="end" class="dash-action">
+                        <Badge e:if={state.sentId === sale.id} variant="success">Sent</Badge>
+                        <Button e:else
+                                size="sm"
+                                loading={state.busyId === sale.id}
+                                attrs={{ title: "Email a fresh link: 5 downloads, 30 days" }}
+                                onclick={() => onResend(state, sale)}>
+                          Resend email
+                        </Button>
+                      </TableCell>
+                    </tr>
+                  </tbody>
+                </table>
+              </Table>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </AdminLayout>
