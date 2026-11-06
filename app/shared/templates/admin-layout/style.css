@@ -22,16 +22,8 @@
   color: var(--accent);
 }
 
-.admin-tabs {
-  border-bottom: 1px solid var(--rule);
-}
-
-.admin-tabs .tab-list {
-  border-bottom: 0;
-}
-
-.admin-tabs .tab {
-  text-decoration: none;
+.admin-tabs .page-shell {
+  padding-block-end: 0;
 }
 
 .admin-main {

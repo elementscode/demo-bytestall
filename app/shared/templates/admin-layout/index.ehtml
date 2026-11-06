@@ -1,5 +1,8 @@
 import "./style.css";
 import { redirect, session } from "@elements/app";
+import { Badge } from "@elements/ui/badge";
+import { Button } from "@elements/ui/button";
+import { Tabs, TabsList, TabsTrigger } from "@elements/ui/tabs";
 import { signout } from "#app/shared/services/auth";
 
 function onSignout() {
@@ -20,23 +23,25 @@ function onSignout() {
             </svg>
             bytestall
           </a>
-          <span class="pill">Creator</span>
+          <Badge variant="secondary">Creator</Badge>
         </div>
 
         <div class="cluster is-md">
           <span class="text-sm admin-user">{session.get("userName")}</span>
           <a class="link-muted text-sm" href="/">View store</a>
-          <button type="button" class="is-ghost is-sm" onclick={() => onSignout()}>Sign out</button>
+          <Button variant="ghost" size="sm" onclick={() => onSignout()}>Sign out</Button>
         </div>
       </div>
     </header>
 
-    <nav class="admin-tabs tabs">
+    <nav class="admin-tabs" aria-label="Creator">
       <div class="page-shell is-wide">
-        <div class="tab-list">
-          <a href="/admin" class={["tab", active === "dashboard" && "is-active"]}>Sales</a>
-          <a href="/admin/products" class={["tab", active === "products" && "is-active"]}>Products</a>
-        </div>
+        <Tabs value={active}>
+          <TabsList label="Creator pages">
+            <TabsTrigger value="dashboard" href="/admin">Sales</TabsTrigger>
+            <TabsTrigger value="products" href="/admin/products">Products</TabsTrigger>
+          </TabsList>
+        </Tabs>
       </div>
     </nav>
 
