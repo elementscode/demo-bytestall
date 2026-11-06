@@ -6,6 +6,8 @@
 
 Card checkout with just an email, a five-use download link, a buyer library, and a creator dashboard with live sales.
 
+Bytestall uses the `commerce` theme from @elements/ui.
+
 [Run this app on your machine](https://elements.dev/demos/01a0f422-a1d8-7d6a-a748-48aa9dcb5a42). Use this demo as inspiration, or as the starting point for your own app. Your agent creates a new app with this one as the scaffold, and you prompt it to add whatever features you want.
 
 ## Payments
