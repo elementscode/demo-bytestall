@@ -91,7 +91,6 @@
   .dash-stat.is-hero {
     grid-column: 1 / -1;
   }
-
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -115,11 +114,6 @@
   .dash-cols .card {
     --card-spacing: var(--space-3);
     --item-padding-x: var(--space-1-5);
-  }
-
-  /* Titles wrap so the numbers stay on screen beside them. */
-  .dash-title {
-    white-space: normal;
   }
 
   .dash-sales thead {

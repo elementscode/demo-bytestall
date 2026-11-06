@@ -33,13 +33,9 @@
     display: none;
   }
 
-  /* Tighter cards on a phone, and names that wrap, so the table fits. */
+  /* Tighter cards on a phone, so the table fits. */
   .products-cols .card {
     --card-spacing: var(--space-3);
     --item-padding-x: var(--space-1-5);
-  }
-
-  .products-name {
-    white-space: normal;
   }
 }

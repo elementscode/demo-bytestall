@@ -125,7 +125,7 @@ function onResend(state: DashState, sale: Sale) {
                   </thead>
                   <tbody>
                     <tr e:for={p of state.value.products}>
-                      <TableCell class="dash-title">{p.title}</TableCell>
+                      <TableCell wrap>{p.title}</TableCell>
                       <TableCell class="dash-bar-cell">
                         <span class="dash-bar" role="img" aria-label={`${p.downloads} downloads`}>
                           <span style={`width: ${(p.downloads / maxDownloads(state.value.products)) * 100}%`}></span>
