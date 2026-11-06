@@ -1,6 +1,10 @@
 import "./style.css";
 import favicon from "#app/shared/assets/favicons/favicon.svg";
 import { redirect } from "@elements/app";
+import { Alert, AlertDescription, AlertTitle } from "@elements/ui/alert";
+import { Badge } from "@elements/ui/badge";
+import { Button } from "@elements/ui/button";
+import { Card, CardContent } from "@elements/ui/card";
 import { StoreLayout } from "#app/shared/templates/store-layout";
 import { coverUrl, fileLabel, formatPrice, productKind } from "#app/shared/services/catalog";
 import { payTestOrder, TestOrder } from "./services";
@@ -36,14 +40,14 @@ function onPay(orderId: string, state: PayState) {
       <div class="page-shell is-form receipt-shell stack is-xl">
         <div class="stack is-sm">
           <div class="cluster is-sm">
-            <span class="pill is-warning">Test mode</span>
+            <Badge variant="warning">Test mode</Badge>
           </div>
           <h1>Checkout</h1>
           <p class="lede">Your download link goes to <strong class="test-email">{order.email}</strong>.</p>
         </div>
 
-        <div class="card">
-          <div class="card-body stack is-lg">
+        <Card>
+          <CardContent class="stack is-lg">
             <div class="receipt-item row">
               <img class="receipt-cover"
                    src={coverUrl({ id: order.productId, coverHash: order.coverHash })}
@@ -64,28 +68,29 @@ function onPay(orderId: string, state: PayState) {
               <span class="test-total-amount">{formatPrice(order.amountCents)}</span>
             </div>
 
-            <p e:if={state.error} class="error" role="alert">{state.error}</p>
+            <Alert e:if={state.error} variant="danger" description={state.error} />
 
             <div class="stack is-sm">
-              <button type="button"
-                      class={["is-primary", "is-lg", "is-block", state.busy && "is-loading"]}
-                      disabled={state.busy}
+              <Button variant="primary"
+                      size="lg"
+                      block
+                      loading={state.busy}
                       onclick={() => onPay(order.id, state)}>
                 Pay {formatPrice(order.amountCents)}
-              </button>
+              </Button>
               <a class="test-cancel link-muted" href={`/products/${order.productSlug}`}>Cancel and go back</a>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
-        <div class="callout is-warning">
-          <div class="callout-title">No card is charged</div>
-          <div class="callout-body">
+        <Alert variant="warning" role="none">
+          <AlertTitle>No card is charged</AlertTitle>
+          <AlertDescription>
             This is the store's built-in test checkout. Paying here records the sale and sends the
             download email like a real payment. Add <code>STRIPE_SECRET_KEY</code> to
             <code>config/env/development.env</code> and this button goes to Stripe Checkout instead.
-          </div>
-        </div>
+          </AlertDescription>
+        </Alert>
       </div>
     </StoreLayout>
   </body>

@@ -34,6 +34,6 @@
   font-size: var(--text-sm);
 }
 
-.page-checkout-test .callout code {
+.page-checkout-test .alert code {
   overflow-wrap: anywhere;
 }
