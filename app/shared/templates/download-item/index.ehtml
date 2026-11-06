@@ -1,4 +1,6 @@
 import "./style.css";
+import { Badge } from "@elements/ui/badge";
+import { Button } from "@elements/ui/button";
 import { coverUrl, fileLabel, formatDate } from "#app/shared/services/catalog";
 import { DOWNLOAD_LIMIT, downloadsLeft, linkState } from "#app/shared/services/downloads";
 import type { DownloadLink } from "#app/shared/services/links";
@@ -23,12 +25,12 @@ function onDownload(link: DownloadLink) {
       <div e:switch={linkState(link)}>
         <div e:case="ready" class="stack is-sm">
           <div class="download-item-actions cluster">
-            <a class="button is-primary"
-               href={`/download/${link.downloadToken}/file`}
-               download={link.fileName}
-               onclick={() => onDownload(link)}>
+            <Button variant="primary"
+                    href={`/download/${link.downloadToken}/file`}
+                    attrs={{ download: link.fileName }}
+                    onclick={() => onDownload(link)}>
               Download {fileLabel(link.fileType)}
-            </a>
+            </Button>
           </div>
           <p class="receipt-note">
             {downloadsLeft(link)} of {DOWNLOAD_LIMIT} downloads left · expires {formatDate(link.expiresAt)}
@@ -36,12 +38,12 @@ function onDownload(link: DownloadLink) {
         </div>
 
         <p e:case="used" class="receipt-note">
-          <span class="pill is-warning">Used {DOWNLOAD_LIMIT} of {DOWNLOAD_LIMIT}</span>
+          <Badge variant="warning">Used {DOWNLOAD_LIMIT} of {DOWNLOAD_LIMIT}</Badge>
           Reply to your download email and the creator will send a fresh link.
         </p>
 
         <p e:case="expired" class="receipt-note">
-          <span class="pill is-warning">Expired {formatDate(link.expiresAt)}</span>
+          <Badge variant="warning">Expired {formatDate(link.expiresAt)}</Badge>
           Reply to your download email and the creator will send a fresh link.
         </p>
       </div>

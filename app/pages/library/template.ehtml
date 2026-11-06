@@ -1,5 +1,6 @@
 import "./style.css";
 import favicon from "#app/shared/assets/favicons/favicon.svg";
+import { Card, CardContent } from "@elements/ui/card";
 import { StoreLayout } from "#app/shared/templates/store-layout";
 import { DownloadItem } from "#app/shared/templates/download-item";
 import { formatDate, formatPrice } from "#app/shared/services/catalog";
@@ -30,16 +31,16 @@ function entries(links: DownloadLink[]): LibraryEntry[] {
           </p>
         </div>
 
-        <div class="card">
-          <div class="card-body">
+        <Card>
+          <CardContent>
             <ul class="library-list stack is-lg">
               <li e:for={entry of entries(links)} class="stack is-sm">
                 <p class="library-bought">Bought {formatDate(entry.paidAt)} · {formatPrice(entry.amountCents)}</p>
                 <DownloadItem link={entry} />
               </li>
             </ul>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
     </StoreLayout>
   </body>

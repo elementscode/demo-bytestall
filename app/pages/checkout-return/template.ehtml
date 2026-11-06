@@ -1,5 +1,6 @@
 import "./style.css";
 import favicon from "#app/shared/assets/favicons/favicon.svg";
+import { Card, CardContent } from "@elements/ui/card";
 import { StoreLayout } from "#app/shared/templates/store-layout";
 import { DownloadItem } from "#app/shared/templates/download-item";
 import type { DownloadLink } from "#app/shared/services/links";
@@ -24,11 +25,11 @@ import type { DownloadLink } from "#app/shared/services/links";
             <p class="lede">We've emailed your download link to <strong>{link!.email}</strong>. You can also download it right now.</p>
           </div>
 
-          <div class="card">
-            <div class="card-body">
+          <Card>
+            <CardContent>
               <DownloadItem link={link!} />
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
           <p class="receipt-note">
             <a class="link-action" href={libraryUrl}>Your library</a> lists everything you've bought with this email.

@@ -8,6 +8,6 @@
   width: var(--space-12);
   height: var(--space-12);
   border-radius: var(--radius-full);
-  background: var(--success-100);
-  color: var(--success-700);
+  background: var(--success-soft);
+  color: var(--success-ink);
 }
