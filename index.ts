@@ -1,4 +1,4 @@
-import { App, getEnv } from "@elements/app";
+import { App, env } from "@elements/app";
 import config from "#config";
 import home from "#app/pages/home";
 import product from "#app/pages/product";
@@ -16,7 +16,7 @@ import { stripeConfigured } from "#app/shared/stripe";
 import notFound from "#app/pages/errors/not-found";
 import unhandled from "#app/pages/errors/unhandled";
 
-if (getEnv() === "production" && !stripeConfigured()) {
+if (env() === "production" && !stripeConfigured()) {
   throw new Error("STRIPE_SECRET_KEY is required in production.");
 }
 
